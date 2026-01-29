@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Broqueza | Brews</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<div id="brewingModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:2000; align-items:center; justify-content:center;">
+    <div style="background:#d4a373; padding:30px; border-radius:15px; text-align:center; width:90%; max-width:400px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); max-height: 90vh; overflow-y: auto;">     
+     <h2 style="color:#2c1810; margin-bottom:10px;">☕ Brewing your order...</h2>
+        <div id="receiptContainer" style="background: #fdfaf6; border: 1px dashed #d4a373; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: left;">
+            <h4 style="border-bottom: 1px solid #d4a373; padding-bottom: 5px; margin-bottom: 10px; text-align: center;">ORDER RECEIPT</h4>
+            <div id="receiptList" style="font-size: 14px; color: #4a4a4a;"></div>
+            <div style="border-top: 1px solid #d4a373; margin-top: 10px; padding-top: 5px; font-weight: bold; display: flex; justify-content: space-between;">
+                <span>Total Paid:</span>
+                <span>₱<span id="receiptTotal">0.00</span></span>
+            </div>
+        </div>
+
+        <p style="font-size:18px; margin-bottom:20px;">Estimated Wait Time: <span id="timer" style="font-weight:bold; color:rgba(0,0,0,0.7);">10:00</span></p>
+        <div style="display:flex; gap:10px;">
+            <button onclick="hideBrewingModal()" style="flex:1; padding:12px; background:green; color:white; border:none; border-radius:8px; cursor:pointer; font-weight:bold;">Wait Order</button>
+            <button onclick="cancelOrder()" style="flex:1; padding:12px; background:#8b0000; color:white; border:none; border-radius:8px; cursor:pointer; font-weight:bold;">Cancel Order</button>
+        </div>
+    </div>
+</div>
+
+<div id="cartPanel" style="display:none; position:fixed; top:80px; right:20px; width:320px; background:white; padding:16px; border-radius:12px; box-shadow:0 10px 25px rgba(0,0,0,0.15); z-index:999;">
+    <h3 style="margin-bottom:10px;">Your Order</h3>
+    <ul id="cartItems" style="list-style:none; padding:0; font-size:14px;"></ul>
+    <p style="margin-top:10px; font-weight:bold;">Total: ₱<span id="cartTotal">0.00</span></p>
+    <button onclick="checkoutCart()" style="margin-top:10px; width:100%; padding:10px; background:#2c1810; color:white; border:none; border-radius:8px;">Checkout</button>
+</div>
+
+<body>
+
+    <nav class="navbar">
+        <div class="logo">Broqueza<span>Brews</span></div>
+        <ul class="nav-links">
+        <li style="position:relative; cursor:pointer;" onclick="toggleCart()">
+    🛒 Cart <span id="cartCount" style="background:#d4a373;color:white;padding:2px 7px;border-radius:50%;font-size:12px;">0</span> </li>
+            <li><a href="#home">Home</a></li>
+            <li><a href="#menu">Menu</a></li>
+            <li><a href="#contact" class="order-btn">Order Now</a></li>
+        </ul>
+    </nav>
+
+    <header id="home" class="hero">
+        <div class="hero-content">
+            <h1>Wake up to <br><span class="highlight">Better Coffee</span></h1>
+            <p>Ethically sourced beans, roasted daily, and brewed with passion.</p>
+            <a href="#menu" class="cta-primary">View Menu</a>
+        </div>
+    </header>
+
+    <section id="menu" class="menu-section">
+        <h2>Our Menu</h2>
+        <div class="filter-buttons">
+        <button class="filter-btn" data-target="hot">Hot</button>
+        <button class="filter-btn" data-target="cold">Cold</button>
+        <button class="filter-btn active" data-target="all">All</button>
+    </div>
+    
+    <div class="menu-grid">
+        <div class="menu-item" data-category="hot">
+            <img src="Signature Espresso.jpg" alt="Espresso">
+            <h3>Signature Espresso</h3>
+            <p>Rich, bold, and pure double shot.</p>
+            <span class="price">₱120.00</span>
+        </div>
+        <div class="menu-item" data-category="hot">
+            <img src="https://images.unsplash.com/photo-1572442388796-11668a67e53d?q=80&w=500" alt="Caramel Macchiato">
+            <h3>Caramel Macchiato</h3>
+            <p>Fresh espresso with steamed milk and caramel drizzle.</p>
+            <span class="price">₱175.00</span>
+        </div>
+        <div class="menu-item" data-category="hot">
+            <img src="Oat Milk Latte.jpg" alt="Oat Latte">
+            <h3>Oat Milk Latte</h3>
+            <p>Creamy, nutty, and perfectly balanced.</p>
+            <span class="price">₱195.00</span>
+        </div>
+        <div class="menu-item" data-category="hot">
+            <img src="Velvet Cappuccino.jpg" alt="Cappuccino">
+            <h3>Velvet Cappuccino</h3>
+            <p>Classic espresso with deep layers of foam.</p>
+            <span class="price">₱185.00</span>
+        </div>
+        <div class="menu-item" data-category="hot">
+            <img src="Dark Choco Mocha.jpg" alt="Mocha">
+            <h3>Dark Choco Mocha</h3>
+            <p>A blend of Belgian chocolate and espresso.</p>
+            <span class="price">₱180.00</span>
+        </div>
+        <div class="menu-item" data-category="hot">
+            <img src="Flat White.jpg" alt="Flat White">
+            <h3>Flat White</h3>
+            <p>Smooth espresso with velvety microfoam milk.</p>
+            <span class="price">₱150.00</span>
+        </div>
+        <div class="menu-item" data-category="hot">
+            <img src="Classic Americano.jpg" alt="Americano">
+            <h3>Classic Americano</h3>
+            <p>Bold espresso diluted with hot water.</p>
+            <span class="price">₱145.00</span>
+        </div>
+        <div class="menu-item" data-category="hot">
+            <img src="Hazelnut Latte.jpg" alt="Hazelnut Latte">
+            <h3>Hazelnut Latte</h3>
+            <p>Espresso blended with sweet hazelnut syrup.</p>
+            <span class="price">₱165.00</span>
+        </div>
+        <div class="menu-item" data-category="cold">
+            <img src="https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?q=80&w=500" alt="Cold Brew">
+            <h3>Broqueza Cold Brew</h3>
+            <p>12-hour steeped signature blend.</p>
+            <span class="price">₱195.00</span>
+        </div>
+        <div class="menu-item" data-category="cold">
+            <img src="https://images.unsplash.com/photo-1515823064-d6e0c04616a7?q=80&w=500" alt="Iced Matcha">
+            <h3>Iced Matcha Latte</h3>
+            <p>Premium grade green tea over ice.</p>
+            <span class="price">₱160.00</span>
+        </div>
+        <div class="menu-item" data-category="cold">
+            <img src="https://images.unsplash.com/photo-1461023058943-07fcbe16d735?q=80&w=500" alt="Iced Americano">
+            <h3>Iced Americano</h3>
+            <p>Chilled espresso shots with crisp water.</p>
+            <span class="price">₱160.00</span>
+        </div>
+        <div class="menu-item" data-category="cold">
+            <img src="Vanilla Bean Frappe.jpg" alt="Vanilla Frappe">
+            <h3>Vanilla Bean Frappe</h3>
+            <p>Blended ice with real vanilla bean cream.</p>
+            <span class="price">₱185.00</span>
+        </div>
+        <div class="menu-item" data-category="cold">
+            <img src="https://images.unsplash.com/photo-1499961024600-ad094db305cc?q=80&w=500" alt="Iced Peach Tea">
+            <h3>Iced Peach Tea</h3>
+            <p>Refreshing black tea with peach nectar.</p>
+            <span class="price">₱75.00</span>
+        </div>
+        <div class="menu-item" data-category="cold">
+            <img src="Iced Caramel Latte.jpg" alt="Iced Caramel Latte">
+            <h3>Iced Caramel Latte</h3>
+            <p>Chilled espresso with caramel sweetness.</p>
+            <span class="price">₱169.00</span>
+        </div>
+        <div class="menu-item" data-category="cold">
+            <img src="Mocha Frappe.jpg" alt="Mocha Frappe">
+            <h3>Mocha Frappe</h3>
+            <p>Blended iced mocha topped with cream.</p>
+            <span class="price">₱190.00</span>
+        </div>
+        <div class="menu-item" data-category="cold">
+            <img src="Iced Vanilla Latte.jpg" alt="Iced Vanilla Latte">
+            <h3>Iced Vanilla Latte</h3>
+            <p>Cold espresso with vanilla cream milk.</p>
+            <span class="price">₱189.00</span>
+        </div>
+    </div>
+</section>
+
+<section id="contact" style="padding: 5rem 10%; background-color: #ffffff; text-align: center;">
+    <h2 style="color: var(--primary); margin-bottom: 2rem;">Contact Us</h2>
+    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 3rem;">
+        <div style="flex: 1; min-width: 250px;">
+            <h3 style="color: var(--accent); margin-bottom: 1rem;">Get in Touch</h3>
+            <p style="margin-bottom: 0.5rem;"><strong>Contact:</strong> +63 912 345 6789</p>
+            <p style="margin-bottom: 0.5rem;"><strong>Website:</strong> <a href="https://website.com" style="color: var(--primary); text-decoration: none;">Broquezabrews.com</a></p>
+        </div>
+        <div style="flex: 1; min-width: 250px;">
+            <h3 style="color: var(--accent); margin-bottom: 1rem;">Our Location</h3>
+            <p><strong>Address:</strong> 123 Coffee Lane, Barista District,<br>Metro Manila, Philippines</p>
+        </div>
+    </div>
+</section>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
+<style>
+:root {
+    --primary: #2c1810;
+    --accent: #d4a373;
+    --light: #fefae0;
+    --text: #4a4a4a;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+    scroll-behavior: smooth;
+}
+
+body {
+    background-color: var(--light);
+    color: var(--text);
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 10%;
+    background: white;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.logo { font-size: 1.5rem; font-weight: 800; color: var(--primary); }
+.logo span { color: var(--accent); }
+
+.nav-links { display: flex; list-style: none; gap: 2rem; align-items: center; }
+.nav-links a { text-decoration: none; color: var(--primary); font-weight: 500; }
+
+.order-btn {
+    background: var(--primary);
+    color: white !important;
+    padding: 0.6rem 1.2rem;
+    border-radius: 50px;
+}
+
+.hero {
+    height: 80vh;
+    display: flex;
+    align-items: center;
+    padding: 0 10%;
+    background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), 
+                url('https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&q=80&w=2070');
+    background-size: cover;
+    background-position: center;
+    color: white;
+}
+
+.hero h1 { font-size: 4rem; line-height: 1.1; margin-bottom: 1.5rem; }
+.highlight { color: var(--accent); }
+
+.cta-primary {
+    display: inline-block;
+    background: var(--accent);
+    color: var(--primary);
+    padding: 1rem 2.5rem;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 5px;
+    margin-top: 1rem;
+}
+
+.menu-section { padding: 5rem 10%; text-align: center; }
+
+.filter-buttons { margin-bottom: 3rem; }
+.filter-btn {
+    padding: 0.5rem 2rem;
+    margin: 0 5px;
+    border: 2px solid var(--primary);
+    background: transparent;
+    cursor: pointer;
+    border-radius: 20px;
+    transition: 0.3s;
+}
+
+.filter-btn.active, .filter-btn:hover {
+    background: var(--primary);
+    color: white;
+}
+
+.menu-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    align-items: stretch;
+}
+
+.menu-item {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: #ffffff;
+    border: 1px solid rgba(0,0,0,0.04);
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: left;
+    height: 100%;
+    transition: transform 0.3s ease;
+}
+
+.menu-item img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    filter: brightness(0.96) contrast(1.05) saturate(0.95);
+    transition: transform 0.35s ease;
+}
+
+.menu-item h3 {
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    font-size: 1.2rem;
+}
+
+.menu-item p {
+    font-size: 0.95rem;
+    opacity: 0.85;
+    margin-bottom: 1.5rem;
+    flex-grow: 1;
+}
+
+.price {
+    font-weight: 800;
+    font-size: 1.2rem;
+    color: var(--primary);
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.menu-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+}
+
+.menu-item:hover img {
+    transform: scale(1.04);
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const menuItems = document.querySelectorAll('.menu-item');
+
+    filterButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            const target = button.getAttribute('data-target');
+
+            menuItems.forEach(item => {
+                const category = item.getAttribute('data-category');
+                if (target === 'all' || target === category) {
+                    item.style.display = 'flex';
+                    item.style.opacity = '0';
+                    setTimeout(() => { item.style.opacity = '1'; }, 10);
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    });
+
+    let cart = {}; 
+    let countdownInterval;
+    let secondsLeft = 600; // 10 minutes
+
+    document.querySelectorAll(".menu-item").forEach(item => {
+        const btn = document.createElement("button");
+        btn.className = "add-cart-btn";
+        btn.innerHTML = `🛒 Add to Cart`; 
+        btn.style = "margin-top:auto; width:100%; padding:10px; background:#2c1810; color:white; border:none; border-radius:8px; cursor:pointer; font-weight:bold;";
+        
+        item.appendChild(btn);
+
+        btn.addEventListener("click", () => {
+            const name = item.querySelector("h3").innerText;
+            const priceText = item.querySelector(".price").innerText;
+            const price = parseFloat(priceText.replace("₱", ""));
+
+            if(cart[name]) {
+                cart[name].qty += 1;
+            } else {
+                cart[name] = { price: price, qty: 1 };
+            }
+
+            updateCart();
+            btn.style.background = "#d4a373";
+            setTimeout(() => { btn.style.background = "#2c1810"; }, 200);
+        });
+    });
+
+    window.changeQty = function(name, amount) {
+        if(cart[name]) {
+            cart[name].qty += amount;
+            if(cart[name].qty <= 0) {
+                delete cart[name];
+            }
+        }
+        updateCart();
+    };
+
+    window.updateCart = function() {
+        const cartList = document.getElementById("cartItems");
+        const cartCount = document.getElementById("cartCount");
+        const cartTotal = document.getElementById("cartTotal");
+        
+        cartList.innerHTML = "";
+        let totalVal = 0;
+        let totalItems = 0;
+
+        for (const [name, details] of Object.entries(cart)) {
+            const li = document.createElement("li");
+            li.style = "display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid #eee; padding-bottom:8px;";
+            
+            const subtotal = details.price * details.qty;
+            totalVal += subtotal;
+            totalItems += details.qty;
+
+            li.innerHTML = `
+                <div style="flex:1;">
+                    <div style="font-weight:bold;">${name}</div>
+                    <div style="font-size:12px; color:#666;">₱${details.price.toFixed(2)} ea.</div>
+                </div>
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <button onclick="changeQty('${name}', -1)" style="width:24px; height:24px; border-radius:4px; border:1px solid #ccc; background:white; cursor:pointer;">-</button>
+                    <span style="font-weight:bold; min-width:20px; text-align:center;">${details.qty}</span>
+                    <button onclick="changeQty('${name}', 1)" style="width:24px; height:24px; border-radius:4px; border:1px solid #ccc; background:white; cursor:pointer;">+</button>
+                </div>
+                <div style="width:60px; text-align:right; font-weight:bold;">₱${subtotal.toFixed(2)}</div>
+            `;
+            cartList.appendChild(li);
+        }
+
+        cartCount.innerText = totalItems;
+        cartTotal.innerText = totalVal.toFixed(2);
+    };
+
+    window.toggleCart = function() {
+        const panel = document.getElementById("cartPanel");
+        panel.style.display = (panel.style.display === "none" || panel.style.display === "") ? "block" : "none";
+    };
+
+    // New Functions for Brewing Popup
+    window.startTimer = function() {
+        if (countdownInterval) clearInterval(countdownInterval);
+        secondsLeft = 600;
+        updateTimerDisplay();
+        
+        countdownInterval = setInterval(() => {
+            secondsLeft--;
+            updateTimerDisplay();
+            if (secondsLeft <= 0) {
+                clearInterval(countdownInterval);
+                alert("Your order is ready! Enjoy your Broqueza Brew!");
+                hideBrewingModal();
+            }
+        }, 1000);
+    };
+
+    window.updateTimerDisplay = function() {
+        const mins = Math.floor(secondsLeft / 60);
+        const secs = secondsLeft % 60;
+        document.getElementById("timer").innerText = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+    };
+
+    window.hideBrewingModal = function() {
+        document.getElementById("brewingModal").style.display = "none";
+    };
+
+    window.cancelOrder = function() {
+        if(confirm("Are you sure you want to cancel your order?")) {
+            clearInterval(countdownInterval);
+            hideBrewingModal();
+            alert("Order Cancelled.");
+        }
+    };
+
+    window.checkoutCart = function() {
+        if (Object.keys(cart).length === 0) {
+            alert("Your cart is empty!");
+            return;
+        }
+
+        // Generate Receipt HTML
+        const receiptList = document.getElementById("receiptList");
+        const receiptTotal = document.getElementById("receiptTotal");
+        receiptList.innerHTML = "";
+        let finalTotal = 0;
+
+        for (const [name, details] of Object.entries(cart)) {
+            const itemTotal = details.price * details.qty;
+            finalTotal += itemTotal;
+            const line = document.createElement("div");
+            line.style = "display: flex; justify-content: space-between; margin-bottom: 5px;";
+            line.innerHTML = `<span>${details.qty}x ${name}</span><span>₱${itemTotal.toFixed(2)}</span>`;
+            receiptList.appendChild(line);
+        }
+        receiptTotal.innerText = finalTotal.toFixed(2);
+        
+        // Clear Cart
+        cart = {};
+        updateCart();
+        toggleCart();
+
+        // Show Brewing Modal and Start Timer
+        document.getElementById("brewingModal").style.display = "flex";
+        startTimer();
+    };
+});
+</script>
